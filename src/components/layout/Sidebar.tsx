@@ -1,6 +1,5 @@
 import { NavLink } from 'react-router-dom'
 import {
-  Sparkles,
   LayoutDashboard,
   Users,
   Image,
@@ -8,6 +7,7 @@ import {
   MessageCircle,
   FileText,
   Megaphone,
+  Settings,
   X,
 } from 'lucide-react'
 
@@ -19,6 +19,7 @@ const navItems = [
   { to: '/whatsapp', label: 'WhatsApp', icon: MessageCircle },
   { to: '/briefing', label: 'Leitor de Briefing', icon: FileText },
   { to: '/campanhas', label: 'Campanhas & Copy', icon: Megaphone },
+  { to: '/configuracoes', label: 'Configurações', icon: Settings },
 ]
 
 export default function Sidebar({
@@ -43,10 +44,8 @@ export default function Sidebar({
         }`}
       >
         <div className="flex h-16 items-center justify-between px-5">
-          <div className="flex items-center gap-2 font-semibold">
-            <div className="h-8 w-8 rounded-lg bg-brand-500 flex items-center justify-center">
-              <Sparkles size={18} />
-            </div>
+          <div className="flex items-center gap-2 font-display font-semibold">
+            <img src="/logo-icon.png" alt="" className="h-8 w-8" />
             Projeto Zero
           </div>
           <button onClick={onClose} className="text-ink-400 hover:text-white lg:hidden">
@@ -61,9 +60,9 @@ export default function Sidebar({
               end={end}
               onClick={onClose}
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                `flex items-center gap-3 rounded-full px-3 py-2.5 text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-brand-600 text-white'
+                    ? 'bg-brand-600 text-ink-950'
                     : 'text-ink-300 hover:bg-white/5 hover:text-white'
                 }`
               }

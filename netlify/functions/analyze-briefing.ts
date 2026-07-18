@@ -1,6 +1,7 @@
 import type { Handler } from '@netlify/functions'
 import { getSupabaseAdmin, getUserFromRequest, jsonResponse, HttpError } from './_shared/supabaseAdmin'
 import { callClaude, extractJson } from './_shared/anthropic'
+import { resolveIntegrationValue } from './_shared/integrationKeys'
 
 interface BriefingAnalysis {
   summary: string
@@ -26,6 +27,13 @@ export const handler: Handler = async (event) => {
       return jsonResponse(400, { error: 'Cole o conteúdo do briefing.' })
     }
 
+    const apiKey = await resolveIntegrationValue(user.id, 'anthropic', 'ANTHROPIC_API_KEY')
+    if (!apiKey) {
+      return jsonResponse(400, {
+        error: 'Configure sua chave da Anthropic em Configurações para usar este recurso.',
+      })
+    }
+
     const systemPrompt =
       'Você é um estrategista de marketing e diretor de criação. Leia o briefing e extraia ' +
       'informações estruturadas, além de gerar prompts prontos para geradores de imagem e vídeo ' +
@@ -46,7 +54,7 @@ Retorne um objeto JSON no formato:
   "video_prompts": ["3 a 5 prompts detalhados para gerar vídeos curtos de campanha"]
 }`
 
-    const raw = await callClaude(systemPrompt, userPrompt, 3000)
+    const raw = await callClaude(systemPrompt, userPrompt, apiKey, 3000)
     const analysis = extractJson<BriefingAnalysis>(raw)
 
     const admin = getSupabaseAdmin()

@@ -1,10 +1,10 @@
-/** Chama a API da Anthropic e retorna o texto da resposta. Pede JSON quando `jsonMode` é true. */
-export async function callClaude(systemPrompt: string, userPrompt: string, maxTokens = 2000) {
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) {
-    throw new Error('ANTHROPIC_API_KEY não configurada nas variáveis de ambiente da Netlify.')
-  }
-
+/** Chama a API da Anthropic e retorna o texto da resposta. */
+export async function callClaude(
+  systemPrompt: string,
+  userPrompt: string,
+  apiKey: string,
+  maxTokens = 2000,
+) {
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {

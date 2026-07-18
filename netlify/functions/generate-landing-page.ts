@@ -1,6 +1,7 @@
 import type { Handler } from '@netlify/functions'
 import { getSupabaseAdmin, getUserFromRequest, jsonResponse, HttpError } from './_shared/supabaseAdmin'
 import { callClaude, extractJson } from './_shared/anthropic'
+import { resolveIntegrationValue } from './_shared/integrationKeys'
 
 interface LandingPageContent {
   headline: string
@@ -44,6 +45,13 @@ export const handler: Handler = async (event) => {
       return jsonResponse(400, { error: 'Informe o nome da página e a descrição do produto.' })
     }
 
+    const apiKey = await resolveIntegrationValue(user.id, 'anthropic', 'ANTHROPIC_API_KEY')
+    if (!apiKey) {
+      return jsonResponse(400, {
+        error: 'Configure sua chave da Anthropic em Configurações para usar este recurso.',
+      })
+    }
+
     const systemPrompt =
       'Você é um copywriter e estrategista de conversão especializado em landing pages. ' +
       'Responda SOMENTE com um objeto JSON válido, sem texto antes ou depois, sem markdown.'
@@ -63,7 +71,7 @@ Retorne um objeto JSON no formato:
   "faq": [{"question": "...", "answer": "..."}] (exatamente 4 itens)
 }`
 
-    const raw = await callClaude(systemPrompt, userPrompt, 3000)
+    const raw = await callClaude(systemPrompt, userPrompt, apiKey, 3000)
     const content = extractJson<LandingPageContent>(raw)
 
     const admin = getSupabaseAdmin()

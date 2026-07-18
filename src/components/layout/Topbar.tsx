@@ -16,7 +16,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
       <div className="hidden lg:block" />
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 rounded-full bg-ink-100 py-1 pl-1 pr-3 text-sm text-ink-700">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-600 text-white">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-600 text-ink-950">
             <User size={14} />
           </div>
           <span className="max-w-[160px] truncate">{user?.email}</span>

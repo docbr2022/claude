@@ -287,3 +287,34 @@ drop trigger if exists on_auth_user_created_pipeline on auth.users;
 create trigger on_auth_user_created_pipeline
   after insert on auth.users
   for each row execute procedure public.create_default_pipeline_stages();
+
+-- ---------- CHAVES DE INTEGRAÇÃO (IA / WhatsApp) ----------
+-- Guarda as chaves de API do usuário (Anthropic, OpenAI, WhatsApp) criptografadas
+-- (AES-256-GCM, feito nas Netlify Functions antes de gravar aqui).
+--
+-- IMPORTANTE: propositalmente NÃO existe nenhuma policy de RLS liberando
+-- select/insert/update/delete para o role "authenticated". Isso significa que
+-- o valor criptografado nunca pode ser lido diretamente pelo navegador (nem
+-- pelo próprio dono da chave via supabase-js) — só é acessível através das
+-- Netlify Functions, que usam a service_role key (que ignora RLS) e exigem
+-- login válido antes de qualquer leitura/escrita/descriptografia.
+create table if not exists public.integration_keys (
+  id uuid primary key default gen_random_uuid(),
+  owner_id uuid not null references auth.users (id) on delete cascade,
+  provider text not null check (
+    provider in (
+      'anthropic',
+      'openai',
+      'whatsapp_access_token',
+      'whatsapp_phone_number_id',
+      'whatsapp_verify_token'
+    )
+  ),
+  encrypted_value text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (owner_id, provider)
+);
+
+alter table public.integration_keys enable row level security;
+-- Sem policies aqui de propósito — veja o comentário acima.

@@ -10,6 +10,7 @@ import LandingPageGenerator from '@/pages/landing-pages/LandingPageGenerator'
 import WhatsappInbox from '@/pages/whatsapp/WhatsappInbox'
 import BriefingReader from '@/pages/briefing/BriefingReader'
 import CampaignCopyGenerator from '@/pages/campaigns/CampaignCopyGenerator'
+import Settings from '@/pages/settings/Settings'
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="/whatsapp" element={<WhatsappInbox />} />
         <Route path="/briefing" element={<BriefingReader />} />
         <Route path="/campanhas" element={<CampaignCopyGenerator />} />
+        <Route path="/configuracoes" element={<Settings />} />
       </Route>
     </Routes>
   )

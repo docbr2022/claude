@@ -1,5 +1,6 @@
 import type { Handler } from '@netlify/functions'
 import { getSupabaseAdmin, getUserFromRequest, jsonResponse, HttpError } from './_shared/supabaseAdmin'
+import { resolveIntegrationValue } from './_shared/integrationKeys'
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -17,10 +18,10 @@ export const handler: Handler = async (event) => {
       return jsonResponse(400, { error: 'Informe um prompt para gerar a imagem.' })
     }
 
-    const apiKey = process.env.OPENAI_API_KEY
+    const apiKey = await resolveIntegrationValue(user.id, 'openai', 'OPENAI_API_KEY')
     if (!apiKey) {
-      return jsonResponse(500, {
-        error: 'OPENAI_API_KEY não configurada nas variáveis de ambiente da Netlify.',
+      return jsonResponse(400, {
+        error: 'Configure sua chave da OpenAI em Configurações para usar este recurso.',
       })
     }
 

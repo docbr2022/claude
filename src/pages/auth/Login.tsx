@@ -85,7 +85,7 @@ export default function Login() {
       </form>
       <p className="mt-6 text-center text-sm text-ink-500">
         Ainda não tem conta?{' '}
-        <Link to="/cadastro" className="font-medium text-brand-600 hover:text-brand-700">
+        <Link to="/cadastro" className="font-medium text-brand-700 hover:text-brand-800">
           Criar conta
         </Link>
       </p>

@@ -75,10 +75,10 @@ export default function LandingPagePreview({ page }: { page: LandingPage }) {
         </button>
       </div>
       <div className="max-h-[560px] overflow-y-auto">
-        <div className="bg-gradient-to-br from-brand-600 to-brand-800 p-10 text-center text-white">
-          <h2 className="text-2xl font-bold">{c.headline}</h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-brand-100">{c.subheadline}</p>
-          <span className="mt-5 inline-block rounded-lg bg-white px-6 py-2.5 text-sm font-semibold text-brand-700">
+        <div className="bg-gradient-to-br from-brand-600 to-brand-700 p-10 text-center text-ink-950">
+          <h2 className="font-display text-2xl font-bold">{c.headline}</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm text-ink-900/80">{c.subheadline}</p>
+          <span className="mt-5 inline-block rounded-full bg-ink-950 px-6 py-2.5 text-sm font-semibold text-brand-600">
             {c.cta_text}
           </span>
         </div>

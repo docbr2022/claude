@@ -116,7 +116,7 @@ export default function ImageGenerator() {
                   download
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-brand-600 hover:text-brand-700"
+                  className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-brand-700 hover:text-brand-800"
                 >
                   <Download size={12} /> Baixar
                 </a>
