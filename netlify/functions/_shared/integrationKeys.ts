@@ -2,8 +2,7 @@ import { getSupabaseAdmin } from './supabaseAdmin'
 import { decryptSecret } from './crypto'
 
 export type IntegrationProvider =
-  | 'anthropic'
-  | 'openai'
+  | 'google'
   | 'whatsapp_access_token'
   | 'whatsapp_phone_number_id'
   | 'whatsapp_verify_token'

@@ -289,7 +289,7 @@ create trigger on_auth_user_created_pipeline
   for each row execute procedure public.create_default_pipeline_stages();
 
 -- ---------- CHAVES DE INTEGRAÇÃO (IA / WhatsApp) ----------
--- Guarda as chaves de API do usuário (Anthropic, OpenAI, WhatsApp) criptografadas
+-- Guarda as chaves de API do usuário (Google/Gemini, WhatsApp) criptografadas
 -- (AES-256-GCM, feito nas Netlify Functions antes de gravar aqui).
 --
 -- IMPORTANTE: propositalmente NÃO existe nenhuma policy de RLS liberando
@@ -303,8 +303,7 @@ create table if not exists public.integration_keys (
   owner_id uuid not null references auth.users (id) on delete cascade,
   provider text not null check (
     provider in (
-      'anthropic',
-      'openai',
+      'google',
       'whatsapp_access_token',
       'whatsapp_phone_number_id',
       'whatsapp_verify_token'
@@ -318,3 +317,11 @@ create table if not exists public.integration_keys (
 
 alter table public.integration_keys enable row level security;
 -- Sem policies aqui de propósito — veja o comentário acima.
+
+-- Se você já rodou este arquivo antes (com 'anthropic'/'openai' na constraint),
+-- rode só o bloco abaixo para atualizar para o provedor 'google':
+--
+-- alter table public.integration_keys drop constraint integration_keys_provider_check;
+-- alter table public.integration_keys add constraint integration_keys_provider_check
+--   check (provider in ('google', 'whatsapp_access_token', 'whatsapp_phone_number_id', 'whatsapp_verify_token'));
+-- delete from public.integration_keys where provider in ('anthropic', 'openai');

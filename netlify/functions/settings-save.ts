@@ -4,8 +4,7 @@ import { encryptSecret } from './_shared/crypto'
 import type { IntegrationProvider } from './_shared/integrationKeys'
 
 const VALID_PROVIDERS: IntegrationProvider[] = [
-  'anthropic',
-  'openai',
+  'google',
   'whatsapp_access_token',
   'whatsapp_phone_number_id',
   'whatsapp_verify_token',

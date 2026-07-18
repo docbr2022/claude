@@ -5,16 +5,10 @@ import IntegrationKeyCard, { type ProviderDef } from './IntegrationKeyCard'
 
 const PROVIDERS: ProviderDef[] = [
   {
-    id: 'anthropic',
-    label: 'Anthropic (Claude)',
-    hint: 'Usada em: Leitor de Briefing, Campanhas & Copy e Gerador de Landing Pages.',
-    placeholder: 'sk-ant-...',
-  },
-  {
-    id: 'openai',
-    label: 'OpenAI',
-    hint: 'Usada em: Gerador de Imagens.',
-    placeholder: 'sk-...',
+    id: 'google',
+    label: 'Google (Gemini / IA Studio)',
+    hint: 'Usada em: Leitor de Briefing, Campanhas & Copy, Gerador de Landing Pages e Gerador de Imagens.',
+    placeholder: 'AIza...',
   },
   {
     id: 'whatsapp_access_token',
@@ -96,7 +90,7 @@ export default function Settings() {
         <KeyRound size={16} className="mt-0.5 shrink-0 text-ink-400" />
         <p>
           Se uma chave não for configurada aqui, o sistema tenta usar a variável de ambiente
-          equivalente configurada direto na Netlify (ex: <code>ANTHROPIC_API_KEY</code>) como
+          equivalente configurada direto na Netlify (ex: <code>GOOGLE_API_KEY</code>) como
           alternativa.
         </p>
       </div>
