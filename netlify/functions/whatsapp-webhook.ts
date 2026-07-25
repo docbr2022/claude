@@ -1,5 +1,6 @@
 import type { Handler } from '@netlify/functions'
 import { getSupabaseAdmin } from './_shared/supabaseAdmin'
+import { resolveIntegrationValue } from './_shared/integrationKeys'
 
 interface MetaWebhookPayload {
   entry?: {
@@ -18,6 +19,8 @@ interface MetaWebhookPayload {
 }
 
 export const handler: Handler = async (event) => {
+  const ownerId = process.env.WHATSAPP_OWNER_USER_ID
+
   // Verificação do webhook (Meta faz um GET na primeira configuração)
   if (event.httpMethod === 'GET') {
     const params = event.queryStringParameters || {}
@@ -25,7 +28,11 @@ export const handler: Handler = async (event) => {
     const token = params['hub.verify_token']
     const challenge = params['hub.challenge']
 
-    if (mode === 'subscribe' && token === process.env.WHATSAPP_VERIFY_TOKEN) {
+    const expectedToken = ownerId
+      ? await resolveIntegrationValue(ownerId, 'whatsapp_verify_token', 'WHATSAPP_VERIFY_TOKEN')
+      : process.env.WHATSAPP_VERIFY_TOKEN
+
+    if (mode === 'subscribe' && token && token === expectedToken) {
       return { statusCode: 200, body: challenge || '' }
     }
     return { statusCode: 403, body: 'Token de verificação inválido.' }
@@ -36,7 +43,6 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    const ownerId = process.env.WHATSAPP_OWNER_USER_ID
     if (!ownerId) {
       console.warn('WHATSAPP_OWNER_USER_ID não configurada — mensagem recebida foi ignorada.')
       return { statusCode: 200, body: 'ok' }

@@ -6,7 +6,7 @@ imagem/vídeo) e gerador de copy/campanhas para Google e Meta Ads.
 
 **Stack:** React + Vite + TypeScript + Tailwind CSS (frontend) · Supabase
 (banco de dados/autenticação) · Netlify Functions (backend serverless) ·
-Anthropic Claude (textos) · OpenAI (imagens) · Meta Cloud API (WhatsApp).
+Google Gemini (textos e imagens) · Meta Cloud API (WhatsApp).
 
 ---
 
@@ -36,17 +36,50 @@ bloqueados.
      exponha essa chave no frontend — ela só é usada dentro das Netlify
      Functions)
 
-## 3. Configurar as chaves de IA (opcional, mas necessário para os módulos de IA)
+> **Já rodou o `schema.sql` antes?** Rodar o arquivo inteiro de novo vai dar
+> erro em "create policy" (já existem). Para pegar só a tabela nova de
+> Configurações, copie e rode apenas o bloco a partir do comentário
+> `-- ---------- CHAVES DE INTEGRAÇÃO` até o final do arquivo.
 
-- **Anthropic (Claude)** — usado para: leitor de briefing, gerador de copy e
-  gerador de landing pages. Crie uma chave em https://console.anthropic.com
-  e coloque em `ANTHROPIC_API_KEY`.
-- **OpenAI** — usado para: gerador de imagens (`gpt-image-1`/DALL-E). Crie
-  uma chave em https://platform.openai.com e coloque em `OPENAI_API_KEY`.
+## 3. Configurar a chave de IA (Google Gemini)
+
+Você tem duas formas de configurar a chave de IA (usada em Leitor de
+Briefing, Campanhas & Copy, Gerador de Landing Pages e Gerador de Imagens) e
+as do WhatsApp:
+
+### Opção recomendada: tela "Configurações" dentro do app
+Depois de logado, acesse **Configurações** no menu lateral e cole cada chave
+lá. Elas ficam **criptografadas no banco** (AES-256-GCM) e **ocultas por
+padrão** — nem você consegue ver o valor de novo depois de salvar, a menos
+que clique no botão de revelar (👁). A tabela nem permite leitura direta pelo
+navegador: só as Netlify Functions (com a service_role key) conseguem
+descriptografar, e só fazem isso quando você pede.
+
+Para essa tela funcionar, adicione mais uma variável de ambiente na Netlify:
+
+```
+SETTINGS_ENCRYPTION_KEY=<gere com: openssl rand -hex 32>
+```
+
+Sem essa variável, salvar/revelar chaves pela tela de Configurações não
+funciona (as Netlify Functions vão retornar erro pedindo para configurá-la).
+
+### Opção alternativa: variável de ambiente global na Netlify
+Se preferir não usar a tela de Configurações (ou quiser uma chave padrão
+compartilhada), pode configurar direto como variável de ambiente da Netlify
+— o sistema usa como alternativa sempre que o usuário não tiver cadastrado a
+própria chave:
+
+- **Google Gemini** — crie uma chave gratuita em
+  https://aistudio.google.com/apikey e coloque em `GOOGLE_API_KEY`. É usada
+  tanto para texto (`gemini-2.5-flash`) quanto para imagem
+  (`gemini-2.5-flash-image`).
 
 ## 4. Configurar o WhatsApp (opcional)
 
-O módulo de WhatsApp usa a **Meta Cloud API** oficial:
+O módulo de WhatsApp usa a **Meta Cloud API** oficial. Os 3 valores abaixo
+também podem ser cadastrados pela tela de **Configurações** dentro do app
+(recomendado) em vez de variável de ambiente:
 
 1. Crie um app em https://developers.facebook.com/apps com o produto
    "WhatsApp".

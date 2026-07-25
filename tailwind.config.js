@@ -5,39 +5,47 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Paleta da marca Café e Criar — amarelo (#D9B607) + dourado (#A78C09) + preto
         brand: {
-          50: '#f0f5ff',
-          100: '#dbe6fe',
-          200: '#bdd1fe',
-          300: '#8fb1fd',
-          400: '#5a89fa',
-          500: '#3563f5',
-          600: '#2444e8',
-          700: '#1e34d1',
-          800: '#1f2ea9',
-          900: '#1f2c84',
-          950: '#171d52',
+          50: '#fffbea',
+          100: '#fff3c4',
+          200: '#ffe985',
+          300: '#ffe400', // amarelo vivo da logo (uso em acentos sobre fundo escuro)
+          400: '#eac706',
+          500: '#e0bd07',
+          600: '#d9b607', // amarelo primário da marca
+          700: '#a78c09', // dourado (hover / secundário)
+          800: '#7a6607',
+          900: '#4d4005',
+          950: '#282103',
         },
         ink: {
-          50: '#f6f7f9',
-          100: '#eceef2',
-          200: '#d5d9e2',
-          300: '#b1b8c8',
-          400: '#8690a8',
-          500: '#67718c',
-          600: '#525b74',
-          700: '#434a5e',
-          800: '#3a3f4f',
-          900: '#242730',
-          950: '#16181e',
+          50: '#f9f8f3',
+          100: '#f3f2ec', // off-white quente (tint de fundo)
+          200: '#e6e3d8', // borda sutil
+          300: '#c9c9c9',
+          400: '#a3a3a0',
+          500: '#6b6b6b', // texto secundário
+          600: '#525250',
+          700: '#3a3a3a', // texto de corpo
+          800: '#242322',
+          900: '#111111', // texto de título
+          950: '#000000', // preto puro (seções escuras)
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Poppins', 'system-ui', 'sans-serif'],
+        display: ['"Baloo 2"', 'Poppins', 'system-ui', 'sans-serif'],
+        script: ['Yellowtail', 'cursive'],
+      },
+      borderRadius: {
+        xl: '20px', // radius-lg da marca — usado nos cards
       },
       boxShadow: {
         soft: '0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.06)',
-        card: '0 2px 8px -2px rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06)',
+        card: '0 10px 30px rgba(0,0,0,.08)',
+        'card-hover': '0 16px 40px rgba(0,0,0,.14)',
+        btn: '0 6px 18px rgba(217,182,7,.35)',
       },
     },
   },

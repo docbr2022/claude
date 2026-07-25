@@ -5,12 +5,9 @@ import { useAuth } from '@/contexts/AuthContext'
 import { callFunction, FunctionCallError } from '@/lib/functions'
 import type { GeneratedImage } from '@/types/database'
 
-const SIZES = ['1024x1024', '1024x1536', '1536x1024']
-
 export default function ImageGenerator() {
   const { user } = useAuth()
   const [prompt, setPrompt] = useState('')
-  const [size, setSize] = useState(SIZES[0])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [images, setImages] = useState<GeneratedImage[]>([])
@@ -40,7 +37,6 @@ export default function ImageGenerator() {
     try {
       const { image } = await callFunction<{ image: GeneratedImage }>('generate-image', {
         prompt,
-        size,
       })
       setImages((prev) => [image, ...prev])
       setPrompt('')
@@ -73,16 +69,6 @@ export default function ImageGenerator() {
             />
           </div>
           <div className="flex flex-wrap items-end gap-3">
-            <div>
-              <label className="label">Formato</label>
-              <select className="input" value={size} onChange={(e) => setSize(e.target.value)}>
-                {SIZES.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </div>
             <button type="submit" disabled={loading} className="btn-primary">
               <Sparkles size={16} />
               {loading ? 'Gerando...' : 'Gerar imagem'}
@@ -116,7 +102,7 @@ export default function ImageGenerator() {
                   download
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-brand-600 hover:text-brand-700"
+                  className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-brand-700 hover:text-brand-800"
                 >
                   <Download size={12} /> Baixar
                 </a>

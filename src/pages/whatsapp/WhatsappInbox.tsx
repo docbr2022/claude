@@ -167,7 +167,7 @@ export default function WhatsappInbox() {
                     <div
                       className={`max-w-[75%] rounded-2xl px-3.5 py-2 text-sm ${
                         m.direction === 'outbound'
-                          ? 'bg-brand-600 text-white'
+                          ? 'bg-brand-600 text-ink-950'
                           : 'bg-ink-100 text-ink-800'
                       }`}
                     >

@@ -1,14 +1,18 @@
 import type { Handler } from '@netlify/functions'
 import { getSupabaseAdmin, getUserFromRequest, jsonResponse, HttpError } from './_shared/supabaseAdmin'
-import { callClaude, extractJson } from './_shared/anthropic'
+import { callGemini } from './_shared/gemini'
+import { extractJson } from './_shared/json'
+import { resolveIntegrationValue } from './_shared/integrationKeys'
 
 interface LandingPageContent {
+  kicker: string
   headline: string
   subheadline: string
   cta_text: string
   benefits: { title: string; description: string }[]
   testimonial: { quote: string; author: string }
   faq: { question: string; answer: string }[]
+  closing_headline: string
 }
 
 function slugify(text: string) {
@@ -44,6 +48,13 @@ export const handler: Handler = async (event) => {
       return jsonResponse(400, { error: 'Informe o nome da página e a descrição do produto.' })
     }
 
+    const apiKey = await resolveIntegrationValue(user.id, 'google', 'GOOGLE_API_KEY')
+    if (!apiKey) {
+      return jsonResponse(400, {
+        error: 'Configure sua chave do Google (Gemini) em Configurações para usar este recurso.',
+      })
+    }
+
     const systemPrompt =
       'Você é um copywriter e estrategista de conversão especializado em landing pages. ' +
       'Responda SOMENTE com um objeto JSON válido, sem texto antes ou depois, sem markdown.'
@@ -55,15 +66,17 @@ Tom de voz: ${tone}
 
 Retorne um objeto JSON no formato:
 {
+  "kicker": "selo curto em maiúsculas acima do título, 2 a 4 palavras (ex: NOVIDADE, OFERTA POR TEMPO LIMITADO)",
   "headline": "título principal impactante",
   "subheadline": "subtítulo que reforça a proposta de valor",
-  "cta_text": "texto do botão de call-to-action",
-  "benefits": [{"title": "...", "description": "..."}] (exatamente 3 itens),
+  "cta_text": "texto do botão de call-to-action, no máximo 4 palavras",
+  "benefits": [{"title": "...", "description": "..."}] (exatamente 3 itens, description com no máximo 2 frases),
   "testimonial": {"quote": "depoimento fictício realista", "author": "Nome, Cargo"},
-  "faq": [{"question": "...", "answer": "..."}] (exatamente 4 itens)
+  "faq": [{"question": "...", "answer": "..."}] (exatamente 4 itens),
+  "closing_headline": "frase curta de fechamento reforçando a urgência de agir agora"
 }`
 
-    const raw = await callClaude(systemPrompt, userPrompt, 3000)
+    const raw = await callGemini(systemPrompt, userPrompt, apiKey, { jsonMode: true, maxTokens: 3000 })
     const content = extractJson<LandingPageContent>(raw)
 
     const admin = getSupabaseAdmin()

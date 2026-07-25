@@ -1,6 +1,8 @@
 import type { Handler } from '@netlify/functions'
 import { getSupabaseAdmin, getUserFromRequest, jsonResponse, HttpError } from './_shared/supabaseAdmin'
-import { callClaude, extractJson } from './_shared/anthropic'
+import { callGemini } from './_shared/gemini'
+import { extractJson } from './_shared/json'
+import { resolveIntegrationValue } from './_shared/integrationKeys'
 
 interface CopyVariation {
   headline: string
@@ -36,6 +38,13 @@ export const handler: Handler = async (event) => {
       return jsonResponse(400, { error: 'Descreva o produto/serviço da campanha.' })
     }
 
+    const apiKey = await resolveIntegrationValue(user.id, 'google', 'GOOGLE_API_KEY')
+    if (!apiKey) {
+      return jsonResponse(400, {
+        error: 'Configure sua chave do Google (Gemini) em Configurações para usar este recurso.',
+      })
+    }
+
     const platformLabel = platform === 'meta' ? 'Meta Ads (Facebook/Instagram)' : 'Google Ads'
 
     const systemPrompt =
@@ -55,7 +64,7 @@ Regras de tamanho:
 Retorne um array JSON com objetos no formato:
 [{"headline": "...", "primary_text": "...", "description": "...", "call_to_action": "..."}]`
 
-    const raw = await callClaude(systemPrompt, userPrompt)
+    const raw = await callGemini(systemPrompt, userPrompt, apiKey, { jsonMode: true })
     const variations = extractJson<CopyVariation[]>(raw)
 
     const admin = getSupabaseAdmin()

@@ -1,5 +1,6 @@
 import type { Handler } from '@netlify/functions'
 import { getSupabaseAdmin, getUserFromRequest, jsonResponse, HttpError } from './_shared/supabaseAdmin'
+import { resolveIntegrationValue } from './_shared/integrationKeys'
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -49,8 +50,16 @@ export const handler: Handler = async (event) => {
       return jsonResponse(404, { error: 'Conversa não encontrada.' })
     }
 
-    const token = process.env.WHATSAPP_ACCESS_TOKEN
-    const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID
+    const token = await resolveIntegrationValue(
+      user.id,
+      'whatsapp_access_token',
+      'WHATSAPP_ACCESS_TOKEN',
+    )
+    const phoneNumberId = await resolveIntegrationValue(
+      user.id,
+      'whatsapp_phone_number_id',
+      'WHATSAPP_PHONE_NUMBER_ID',
+    )
     let status: 'sent' | 'failed' | 'queued' = 'queued'
 
     if (token && phoneNumberId) {

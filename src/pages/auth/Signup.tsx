@@ -103,7 +103,7 @@ export default function Signup() {
       </form>
       <p className="mt-6 text-center text-sm text-ink-500">
         Já tem conta?{' '}
-        <Link to="/entrar" className="font-medium text-brand-600 hover:text-brand-700">
+        <Link to="/entrar" className="font-medium text-brand-700 hover:text-brand-800">
           Entrar
         </Link>
       </p>
