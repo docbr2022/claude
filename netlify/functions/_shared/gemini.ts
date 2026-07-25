@@ -1,5 +1,14 @@
 const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models'
 
+// "-latest" são aliases que o Google mantém sempre apontando para o modelo
+// atual recomendado, evitando quebrar quando um modelo fixo é descontinuado.
+// Mantemos uma lista de fallback caso um alias específico também mude.
+const TEXT_MODEL_CANDIDATES = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash']
+
+function isModelUnavailable(status: number, errBody: string) {
+  return status === 404 || /not found|no longer available/i.test(errBody)
+}
+
 /** Chama a API do Gemini (texto) e retorna a resposta como string. */
 export async function callGemini(
   systemPrompt: string,
@@ -7,32 +16,43 @@ export async function callGemini(
   apiKey: string,
   options: { jsonMode?: boolean; maxTokens?: number; model?: string } = {},
 ) {
-  const { jsonMode = false, maxTokens = 2000, model = 'gemini-2.5-flash' } = options
+  const { jsonMode = false, maxTokens = 2000, model } = options
+  const candidates = model ? [model] : TEXT_MODEL_CANDIDATES
 
-  const res = await fetch(`${BASE_URL}/${model}:generateContent?key=${apiKey}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: systemPrompt }] },
-      contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-      generationConfig: {
-        maxOutputTokens: maxTokens,
-        ...(jsonMode ? { responseMimeType: 'application/json' } : {}),
-      },
-    }),
-  })
+  let lastError: Error | null = null
 
-  if (!res.ok) {
-    const errBody = await res.text()
-    throw new Error(`Falha ao chamar a API do Gemini: ${errBody}`)
+  for (const candidateModel of candidates) {
+    const res = await fetch(`${BASE_URL}/${candidateModel}:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+        generationConfig: {
+          maxOutputTokens: maxTokens,
+          ...(jsonMode ? { responseMimeType: 'application/json' } : {}),
+        },
+      }),
+    })
+
+    if (!res.ok) {
+      const errBody = await res.text()
+      if (isModelUnavailable(res.status, errBody) && candidateModel !== candidates[candidates.length - 1]) {
+        lastError = new Error(`Falha ao chamar a API do Gemini: ${errBody}`)
+        continue
+      }
+      throw new Error(`Falha ao chamar a API do Gemini: ${errBody}`)
+    }
+
+    const data = (await res.json()) as {
+      candidates?: { content?: { parts?: { text?: string }[] } }[]
+    }
+    const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? ''
+    if (!text) throw new Error('O Gemini não retornou nenhum texto.')
+    return text
   }
 
-  const data = (await res.json()) as {
-    candidates?: { content?: { parts?: { text?: string }[] } }[]
-  }
-  const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? ''
-  if (!text) throw new Error('O Gemini não retornou nenhum texto.')
-  return text
+  throw lastError ?? new Error('Nenhum modelo de texto do Gemini disponível.')
 }
 
 /** Gera uma imagem com o Gemini e retorna como data URL (base64). */

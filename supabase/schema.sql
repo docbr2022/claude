@@ -319,9 +319,13 @@ alter table public.integration_keys enable row level security;
 -- Sem policies aqui de propósito — veja o comentário acima.
 
 -- Se você já rodou este arquivo antes (com 'anthropic'/'openai' na constraint),
--- rode só o bloco abaixo para atualizar para o provedor 'google':
+-- rode só o bloco abaixo para atualizar para o provedor 'google'.
+-- IMPORTANTE: o delete precisa vir ANTES de recriar a constraint, senão o
+-- Postgres rejeita a troca por causa das linhas antigas que ainda violam a
+-- constraint nova.
 --
+-- delete from public.integration_keys
+--   where provider not in ('google', 'whatsapp_access_token', 'whatsapp_phone_number_id', 'whatsapp_verify_token');
 -- alter table public.integration_keys drop constraint integration_keys_provider_check;
 -- alter table public.integration_keys add constraint integration_keys_provider_check
 --   check (provider in ('google', 'whatsapp_access_token', 'whatsapp_phone_number_id', 'whatsapp_verify_token'));
--- delete from public.integration_keys where provider in ('anthropic', 'openai');
